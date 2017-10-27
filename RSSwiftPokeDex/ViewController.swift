@@ -76,6 +76,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             cell.heightVal.text = poke.height
             cell.weightVal.text = poke.weight
             //cell.typeVal.text = poke.type
+            if(poke.thumbnail != nil){
+                cell.spriteImg.image = poke.thumbnail!
+            }
             
         } else {
             var poke = pokemons[indexPath.row] as! Dictionary<String, String>
@@ -128,11 +131,43 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             }
         }
         
-       /* if(pokes.count == pokemons.count){
+        if(pokes.count == pokemons.count){
             DispatchQueue.global().async {
-                TODO get Thumbnails
+                self.getPokemonSprites()
             }
-        }*/
+        }
+    }
+    
+    internal func getPokemonSprites()->Void {
+    
+            for i in 0..<self.pokes.count{
+                let imgUrl = self.pokes[i].spriteUrl
+                if(imgUrl != nil) {
+                    let pokeName = self.pokes[i].name
+                    let semaphore = DispatchSemaphore(value: 0)
+                    RSDataFetcherAPI.getPokemonSprite(spriteURL: imgUrl!, name: pokeName){ (image, error) in
+                        
+                        if(error != nil){
+                            print(error!)
+                        } else {
+                            
+                            if(image != nil){
+                                self.pokes[i].thumbnail = image
+                                DispatchQueue.main.async {
+                                    let indexPath = IndexPath(item: i, section: 0)
+                                    self.pokeTableView.reloadRows(at: [indexPath], with: .none)
+                                }
+                                
+                            }
+                        }
+                        semaphore.signal()
+                        
+                    
+                    }
+                    semaphore.wait()
+                } //if(imgUrl != nil)
+            }// end for
+    
     }
 
 

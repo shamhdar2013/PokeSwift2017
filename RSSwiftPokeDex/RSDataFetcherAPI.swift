@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 
 
@@ -91,9 +92,6 @@ class RSDataFetcherAPI{
                     pokeDict["type"] = typeVal as? String
                 }
                 
-                 //print("*******************")
-                 //print(pokeDict)
-                //print("*******************\n")
                 completion(pokeDict, error)
                 
             } catch let error as JSONError {
@@ -108,5 +106,22 @@ class RSDataFetcherAPI{
         task.resume();
     }
 
+    class func getPokemonSprite(spriteURL: URL, name: String, completion:@escaping(UIImage?, Error?)->Void){
+        
+        let session = URLSession.shared
+        let task = session.dataTask(with: spriteURL){(data, response, error) in
+            
+            if (error != nil){
+                completion(nil, error)
+            }
+            if (data != nil){
+                let image:UIImage = UIImage(data:data!)!
+                completion(image, nil)
+            }
+            
+        }
+        task.resume()
+        
+    }
     
 }
