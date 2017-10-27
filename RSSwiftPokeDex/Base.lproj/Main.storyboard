@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="RSSwiftPokeDex" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="EwO-GO-zuw">
+                                <rect key="frame" x="0.0" y="83" width="375" height="527"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="oCF-AP-XgA"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="iVf-Mt-vBY"/>
+                                </connections>
+                            </tableView>
+                            <tabBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ItA-xo-2aQ">
+                                <rect key="frame" x="0.0" y="610" width="375" height="49"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <items>
+                                    <tabBarItem systemItem="search" id="hTt-hC-5f5"/>
+                                </items>
+                            </tabBar>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pokedex" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5D7-3F-lw7">
+                                <rect key="frame" x="0.0" y="38" width="375" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="MHL-Hx-fMb"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="5D7-3F-lw7" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="18" id="0gt-Mb-G1O"/>
+                            <constraint firstAttribute="trailing" secondItem="EwO-GO-zuw" secondAttribute="trailing" id="1rC-us-4z9"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="EwO-GO-zuw" secondAttribute="bottom" constant="57" id="3p1-YI-Los"/>
+                            <constraint firstItem="5D7-3F-lw7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="CLo-1N-rFO"/>
+                            <constraint firstItem="EwO-GO-zuw" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="GRD-jO-RpD"/>
+                            <constraint firstAttribute="trailing" secondItem="ItA-xo-2aQ" secondAttribute="trailing" id="HMg-ga-TiS"/>
+                            <constraint firstItem="EwO-GO-zuw" firstAttribute="top" secondItem="5D7-3F-lw7" secondAttribute="bottom" constant="1" id="LWq-NU-rss"/>
+                            <constraint firstItem="ItA-xo-2aQ" firstAttribute="top" secondItem="EwO-GO-zuw" secondAttribute="bottom" id="NyH-8z-peh"/>
+                            <constraint firstItem="ItA-xo-2aQ" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Ujg-Xg-qhu"/>
+                            <constraint firstAttribute="trailing" secondItem="5D7-3F-lw7" secondAttribute="trailing" id="tbo-Wq-Qfg"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="pokeTableView" destination="EwO-GO-zuw" id="LRs-1E-yHW"/>
+                        <outlet property="searchButton" destination="hTt-hC-5f5" id="u3t-GH-3MH"/>
+                        <outlet property="titleLbl" destination="5D7-3F-lw7" id="S6d-HX-7fN"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="140" y="138.98050974512745"/>
+        </scene>
+    </scenes>
+</document>
