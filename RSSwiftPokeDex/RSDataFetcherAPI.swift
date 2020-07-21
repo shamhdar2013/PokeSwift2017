@@ -18,10 +18,11 @@ class RSDataFetcherAPI{
     enum JSONError: String, Error {
         case NoData = "ERROR: no data"
         case ConversionFailed = "ERROR: conversion from JSON failed"
+        case badURL = "ERROR: no valid URL"
     }
     class func getPokemons(completion:@escaping(Array<Dictionary<String, AnyObject>>?, Error?)->Void){
         let session = URLSession.shared
-        let urlStr = baseUrl!//+String("/pokemon")
+        let urlStr = baseUrl
         let listUrl = URL(string: urlStr)
         let task = session.dataTask(with: listUrl!){ (data, response, error) in
             do {
@@ -31,11 +32,14 @@ class RSDataFetcherAPI{
                 guard let json = try JSONSerialization.jsonObject(with: data, options:.allowFragments) as? Dictionary<String, AnyObject> else {
                     throw JSONError.ConversionFailed
                 }
-                //print(json)
+     
+                if  let arr = json["results"] as? Array<Dictionary<String, AnyObject>> {
+                   completion(arr, nil)
+                } else {
+                    let error = JSONError.ConversionFailed as NSError
+                    completion(nil, error)
+                }
                 
-                let arr = json["results"] as! Array<Dictionary<String, AnyObject>>
-                
-                completion(arr, nil)
             } catch let error as JSONError {
                 print(error.rawValue)
                 completion(nil, error)
@@ -60,35 +64,23 @@ class RSDataFetcherAPI{
                 }
                 //print(json)
                 var pokeDict = [String: String]()
-                pokeDict["name"] = json["name"] as? String
-                var htVal = json ["height"] as? Int64
+                pokeDict["name"] = json["name"] as? String ?? " "
+                let htVal = json ["height"] as? Int64 ?? 10
+                pokeDict["height"] = String("\(htVal)")
                 
-                if(htVal == nil){
-                    htVal = 10
-                }
-                pokeDict["height"] = String("\(htVal!)")
-                var wtVal = json ["weight"] as? Int64
-                if(wtVal == nil){
-                   wtVal = 12
-                }
+                let wtVal = json ["weight"] as? Int64 ?? 12
+                pokeDict["weight"] = String("\(wtVal)")
                 
-                pokeDict["weight"] = String("\(wtVal!)")
-                var idVal = json["id"] as? Int64
+                let idVal = json["id"] as? Int64 ?? 55
+                pokeDict["id"] = String("\(idVal)")
                 
-                if(idVal == nil){
-                    idVal = 55
-                }
-                pokeDict["id"] = String("\(idVal!)")
-                
-                let sprites = json["sprites"]
-                if(sprites != nil){
-                    let spriteUrl = sprites!["front_default"]
-                    pokeDict["spriteUrl"] = spriteUrl as? String
+                if let sprites = json["sprites"] {
+                    let spriteUrl = sprites["front_default"]
+                    pokeDict["spriteUrl"] = spriteUrl as? String ?? " "
                 }
 
-                let types = json["types"] as? Array<Dictionary<String, Any>>
-                if(types != nil){
-                    let typeVal = types![0]["type"]
+                if let types = json["types"] as? Array<Dictionary<String, Any>> {
+                    let typeVal = types[0]["type"]
                     pokeDict["type"] = typeVal as? String
                 }
                 

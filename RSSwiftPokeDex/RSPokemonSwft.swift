@@ -31,36 +31,22 @@ class Pokemon{
         self.spriteUrl = spriteUrl
     }
     
-    init?(attributes: Dictionary<String, String>, thumbNail: UIImage?){
+    init?(attributes: [String: String], thumbNail: UIImage?){
         guard !attributes.isEmpty else {
-            return nil;
-        }
-        
-        let nStr = attributes["name"]
-        guard (nStr != nil) else {
             return nil
         }
-        self.name = nStr!
         
-        let idStr = attributes["id"]
-        self.id = (idStr != nil) ? idStr! : "20"
+        name = attributes["name"] ?? " "
+        id = attributes["id"] ?? "20"
+        type = attributes["type"] ?? "Fire"
+        height = attributes["height"] ?? "10"
+        weight = attributes["weight"] ?? "12"
         
-        
-        let tyStr = attributes["type"]
-        self.type = (tyStr != nil) ? tyStr! : "Fire"
-        
-        let hStr = attributes["height"]
-        self.height = (hStr != nil) ? hStr! : "10"
-        
-        let wStr = attributes["weight"]
-        self.weight = (wStr != nil) ? wStr! : "12"
-        
-        let urlStr = attributes["spriteUrl"]
-        self.spriteUrl = (urlStr != nil) ? URL(string:urlStr!) : URL(string:"https/madeup.com")
-        
-        
+        var spurl = URL(string:"https/madeup.com")
+        if let urlStr = attributes["spriteUrl"] {
+         spurl = URL(string:urlStr)
+        }
+        spriteUrl = spurl
         self.thumbnail = thumbNail
-        
     }
-    
 }

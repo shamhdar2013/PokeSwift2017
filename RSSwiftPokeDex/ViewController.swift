@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class ViewController: UIViewController {
     
     // MARK: - IBOutlets
     @IBOutlet weak var pokeTableView: UITableView!
@@ -26,24 +26,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         let cellNib = UINib(nibName: "RSPokeTableViewCell", bundle:nil)
         self.pokeTableView.register(cellNib, forCellReuseIdentifier:"RSPokeTableViewCell")
+        
         RSDataFetcherAPI.getPokemons(){ (array, error) in
-            if(array != nil){
-                let arr = array!
-                for i in 0..<arr.count {
-                    self.pokemons.append(arr[i])
-                }
-                DispatchQueue.global().async{
-                    self.getPokemonDetails()
-                }
-                
-                DispatchQueue.main.async {
-                    self.pokeTableView.reloadData()
-                }
+            guard let arr = array  else { return }
+            for i in 0..<arr.count {
+                self.pokemons.append(arr[i])
+            }
+            DispatchQueue.global().async{
+                self.getPokemonDetails()
+            }
+            
+            DispatchQueue.main.async {
+                self.pokeTableView.reloadData()
             }
         }
-        
-        
-        // Do any additional setup after loading the view, typically from a nib.
     }
 
     override func didReceiveMemoryWarning() {
@@ -51,94 +47,47 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         // Dispose of any resources that can be recreated.
     }
     
-    // MARK: UITableViewDataSource
-   func tableView(_ tableView: UITableView,
-                           numberOfRowsInSection section: Int) -> Int {
-    
-    return self.pokemons.count
-    
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        // Table view cells are reused and should be dequeued using a cell identifier.
-        let cellIdentifier = "RSPokeTableViewCell"
-        
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? RSPokeTableViewCell  else {
-            fatalError("The dequeued cell is not an instance of RSPokeTableViewCell.")
-        }
-        
-        if(pokes.count > indexPath.row){
-            
-            let poke = pokes[indexPath.row]
-            cell.nameVal.text = poke.name
-            cell.idVal.text = poke.id
-            cell.heightVal.text = poke.height
-            cell.weightVal.text = poke.weight
-            //cell.typeVal.text = poke.type
-            if(poke.thumbnail != nil){
-                cell.spriteImg.image = poke.thumbnail!
-            }
-            
-        } else {
-            var poke = pokemons[indexPath.row] as! Dictionary<String, String>
-            cell.nameVal.text = poke["name"]
-        }
-        
-        return cell
-    }
-    
-    //Mark: TableViewDelegate
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
-    {
-        return 200.0;//Choose your custom row height
-    }
-    
+   
     //Mark: internal helper functions
-    internal func getPokemonDetails()-> Void {
+    func getPokemonDetails()-> Void {
         
         for i in 0..<pokemons.count {
-            let poke = pokemons[i] as! Dictionary<String, String>
-            let pokeName = poke["name"]
-            let detailUrl = URL(string:poke["url"]!)
-            
-            if(detailUrl != nil){
-                let semaphore = DispatchSemaphore(value: 0)
-                RSDataFetcherAPI.getPokemonDetails(detailsURL: detailUrl!, name: pokeName!){ (dict, error) in
-                    
-                    if(error != nil){
-                        print(error!)
+            if let poke = pokemons[i] as? Dictionary<String, String> {
+                let pokeName = poke["name"]
+                let detailUrl = URL(string:poke["url"]!)
+                
+                if(detailUrl != nil){
+                    let semaphore = DispatchSemaphore(value: 0)
+                    RSDataFetcherAPI.getPokemonDetails(detailsURL: detailUrl!, name: pokeName!){ (dict, error) in
                         
-                    } else {
-                        if(dict != nil){
-                            //print(dict!)
-                            let pkmn = Pokemon.init(attributes:dict!, thumbNail:nil)
-                            if(pkmn != nil) {
-                                self.pokes.append(pkmn!)
-                                
+                        if let error = error {
+                            print(error)
+                        } else {
+                            if  let dict = dict {
+                                if let pkmn = Pokemon.init(attributes:dict, thumbNail:nil) {
+                                    self.pokes.append(pkmn)
+                                }
                             }
                         }
-                        
+                        DispatchQueue.main.async {
+                            let indexPath = IndexPath(item: i, section: 0)
+                            self.pokeTableView.reloadRows(at: [indexPath], with: .none)
+                        }
+                        semaphore.signal()
                     }
-                    DispatchQueue.main.async {
-                        
-                        let indexPath = IndexPath(item: i, section: 0)
-                        self.pokeTableView.reloadRows(at: [indexPath], with: .none)
-                    }
-                    semaphore.signal()
+                    semaphore.wait()
                 }
-                semaphore.wait()
             }
         }
         
-        if(pokes.count == pokemons.count){
+        if (pokes.count == pokemons.count){
             DispatchQueue.global().async {
                 self.getPokemonSprites()
             }
         }
     }
     
-    internal func getPokemonSprites()->Void {
+    func getPokemonSprites()->Void {
     
             for i in 0..<self.pokes.count{
                 let imgUrl = self.pokes[i].spriteUrl
@@ -161,15 +110,53 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                             }
                         }
                         semaphore.signal()
-                        
-                    
                     }
                     semaphore.wait()
                 } //if(imgUrl != nil)
             }// end for
     
     }
-
-
 }
 
+extension ViewController:  UITableViewDataSource, UITableViewDelegate {
+
+  func tableView(_ tableView: UITableView,
+                          numberOfRowsInSection section: Int) -> Int {
+   
+   return self.pokemons.count
+   
+   }
+
+   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+       
+       // Table view cells are reused and should be dequeued using a cell identifier.
+       let cellIdentifier = "RSPokeTableViewCell"
+       
+       guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? RSPokeTableViewCell  else {
+           fatalError("The dequeued cell is not an instance of RSPokeTableViewCell.")
+       }
+       
+       if (pokes.count > indexPath.row) {
+           let poke = pokes[indexPath.row]
+           cell.nameVal.text = poke.name
+           cell.idVal.text = poke.id
+           cell.heightVal.text = poke.height
+           cell.weightVal.text = poke.weight
+           //cell.typeVal.text = poke.type
+           cell.spriteImg.image = poke.thumbnail
+       } else {
+           if let poke = pokemons[indexPath.row] as? Dictionary<String, String> {
+               cell.nameVal.text = poke["name"]
+           }
+       }
+       
+       return cell
+   }
+   
+   //Mark: TableViewDelegate
+   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
+   {
+       return 200.0;//Choose your custom row height
+   }
+}
+   
